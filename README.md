@@ -9,3 +9,4 @@
 - La puerta debera cerrarse automaticamente pasado un cierto tiempo
 - Mediante un sensor infrarojo haremos que la puerta no se cierre si hay un obstaculo en medio
 - Implementaremos interruptores de limite para detectar si la puerta esta completamente abierta o cerrada
+- Cualquier cosa
