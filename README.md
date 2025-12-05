@@ -1,0 +1,11 @@
+**Lista de requisitos**
+- Debe poder abrirse con el movil
+- Debe usar un motor DC
+- Debe usar un ESP8266
+- El motor se debe accionar mediante un MOSFET
+- Se debe usar un diodo para proteger de corrientes inversas
+- Intentaremos implementar sensores NFC para que la puerta se abra automaticamente cuando llegue un coche con la tarjeta correspondiente
+- Implementaremos leds que indiquen si la puerta se esta abriendo y si el garaje esta ocupado o libre
+- La puerta debera cerrarse automaticamente pasado un cierto tiempo
+- Mediante un sensor infrarojo haremos que la puerta no se cierre si hay un obstaculo en medio
+- Implementaremos interruptores de limite para detectar si la puerta esta completamente abierta o cerrada
