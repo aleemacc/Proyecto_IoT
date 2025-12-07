@@ -4,7 +4,7 @@
 - Debe usar un ESP8266
 - El motor se debe accionar mediante un MOSFET
 - Se debe usar un diodo para proteger de corrientes inversas
-- Intentaremos implementar sensores NFC para que la puerta se abra automaticamente cuando llegue un coche con la tarjeta correspondiente
+- Intentaremos implementar sensores NFC para que la puerta se abra automaticamente cuando llegue un coche con la tarjeta correspondiente (https://arduinogetstarted.com/tutorials/arduino-rfid-nfc-door-lock-system)
 - Implementaremos leds que indiquen si la puerta se esta abriendo y si el garaje esta ocupado o libre
 - La puerta debera cerrarse automaticamente pasado un cierto tiempo
 - Mediante un sensor infrarojo haremos que la puerta no se cierre si hay un obstaculo en medio
