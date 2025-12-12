@@ -2,6 +2,9 @@
 - Debe poder abrirse con el movil
 - Debe usar un motor DC
 - Debe usar un ESP8266
+    - Para el ESP8266 (nuestra version es el nodeMCU) necesitamos alimentarlo con 5v constantes (https://lastminuteengineers.com/esp8266-pinout-reference/)
+        - Una opcion es usar una powerbank y alimentarlo por USB
+        - Otra opcion es usar una pila de 9v para todo el circuito y meter un regulador de voltage para la placa.
 - El motor se debe accionar mediante un MOSFET
 - Se debe usar un diodo para proteger de corrientes inversas
 - Intentaremos implementar sensores NFC para que la puerta se abra automaticamente cuando llegue un coche con la tarjeta correspondiente (https://arduinogetstarted.com/tutorials/arduino-rfid-nfc-door-lock-system)
