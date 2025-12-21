@@ -5,10 +5,12 @@
     - Para el ESP8266 (nuestra version es el nodeMCU) necesitamos alimentarlo con 5v constantes (https://lastminuteengineers.com/esp8266-pinout-reference/)
         - Una opcion es usar una powerbank y alimentarlo por USB
         - Otra opcion es usar una pila de 9v para todo el circuito y meter un regulador de voltage para la placa.
-- El motor se debe accionar mediante un MOSFET
+- El motor se debe accionar mediante un MOSFET 
+    - En la carpeta "files" he añadido una imágen con el circuito que diseñamos en el crai para el motor, incluyendo los diodos para proteger de corrientes inversas. Tambien he puesto un MOSFET que nos puede servir (Que yo ya tengo de esos).
 - Se debe usar un diodo para proteger de corrientes inversas
 - Intentaremos implementar sensores NFC para que la puerta se abra automaticamente cuando llegue un coche con la tarjeta correspondiente (https://arduinogetstarted.com/tutorials/arduino-rfid-nfc-door-lock-system)
 - Implementaremos leds que indiquen si la puerta se esta abriendo y si el garaje esta ocupado o libre
 - La puerta debera cerrarse automaticamente pasado un cierto tiempo
 - Mediante un sensor infrarojo haremos que la puerta no se cierre si hay un obstaculo en medio
 - Implementaremos interruptores de limite para detectar si la puerta esta completamente abierta o cerrada
+    - He añadido una imágen en la carpeta de "files" con un posible circuito para la implementacion de los interruptores, con esta implementación solo hariamos uso de un pin de la placa, lo que nos deja más pines libres para otras utilidades. Un problema de este circuito es que con el no sabremos si la puerta esta abirta o cerrada, solo sabremos que esta en uno de los extremos. En ese caso habria que hacerlo guardando en alguna variable si el ultimo estado de la puerta era "abriendo" ó "cerrando", y a partir de eso deducir que deberia hacer despues.
