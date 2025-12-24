@@ -2,9 +2,14 @@
 
 //GPIO pins que podemos usar: D1, D2, D5, D6, D7, A0(solo analog read)
 
-const int pinAbrir = 1;
-const int pinCerrar = 2;
-const int pinInterrupcion = 7;
+uint8_t pinAbrir = D1;
+uint8_t pinCerrar = D2;
+uint8_t pinInterrupcion = D7;
+uint8_t boton = D5; 
+/*
+Para hacer pruebas podemos usar el codigo asi y conectar un boton al pin D5, para el proyecto terminado tendremos que cambiar esto por el boton del movil, controlado 
+desde arduino cloud
+*/
 bool estado = false; //mi idea es usar un boolean para guardar si la puerta se estaba abriendo o cerrando. Por ejemplo podemos llamar false a cerrado y true a abierto
 int estados = 0; 
 /*
@@ -18,6 +23,7 @@ el booleano "estado" nos sigue sirviendo pero para indicar el ultimo estado de l
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
+  pinMode(boton, INPUT_PULLUP);
   pinMode(pinInterrupcion, INPUT_PULLUP); //usamos la resistencia pullup integrada en la placa
   pinMode(pinAbrir, OUTPUT);
   pinMode(pinCerrar, OUTPUT);
@@ -34,6 +40,21 @@ puerta es abrirse. De este modo sabremos que la siguiente accion sera cerrar, y 
 
 void loop() {
   
+  if (estados == 0 && digitalRead(boton)==LOW)
+  {
+    /* code */
+    if (estado)
+    {
+      /* code */
+      estados = 2;
+    }
+    else {
+      estado = 1;
+    }
+    
+  }
+  
+
   if (estados == 1)
   {
     /*
