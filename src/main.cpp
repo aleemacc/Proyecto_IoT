@@ -27,7 +27,7 @@ void setup() {
   pinMode(pinInterrupcion, INPUT_PULLUP); //usamos la resistencia pullup integrada en la placa
   pinMode(pinAbrir, OUTPUT);
   pinMode(pinCerrar, OUTPUT);
-  attachInterrupt(pinInterrupcion, isr, FALLING); //Esto define una interrupcion, el primer valor es el pin que se observa, el segundo es la funcion a la que se llama en caso de la interrupcion, y el tercer valor es en que evento del pin llama a la funcion.
+  attachInterrupt(pinInterrupcion, isr, RISING); //Esto define una interrupcion, el primer valor es el pin que se observa, el segundo es la funcion a la que se llama en caso de la interrupcion, y el tercer valor es en que evento del pin llama a la funcion.
 
 }
 
@@ -62,12 +62,16 @@ void loop() {
     interruptor de limite y ejecute la interrupcion, que debera cambiar estado a true
     */
     digitalWrite(pinCerrar, LOW);
+    // interesa poner algun delay para que de tiempo a que el mosfet se cierre
     digitalWrite(pinAbrir, HIGH);
   }
   else if (estados == 2)
   {
-    digitalWrite(pinCerrar, HIGH);
     digitalWrite(pinAbrir, LOW);
+    // aqui tambien ponemos delay
+    digitalWrite(pinCerrar, HIGH);
+
+    
   }
   else{
     digitalWrite(pinCerrar, LOW);
