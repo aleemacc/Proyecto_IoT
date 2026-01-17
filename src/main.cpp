@@ -1,113 +1,110 @@
 #include <Arduino.h>
 
-//GPIO pins que podemos usar: D1, D2, D5, D6, D7, A0(solo analog read)
+/* 
+Para la placa podemos usar los pines D1, D2, D5, D6, D7, A0(solo para analogRead)
+*/
+const uint8_t pinAbrir = D1;
+const uint8_t pinCerrar = D2;
+const uint8_t pinInterrupcion = D7;
+const uint8_t boton = D5; //Este boton es temporal para hacer pruebas, el funcionamiento del boton lo tenemos que implementar con Arduino Cloud
 
-uint8_t pinAbrir = D1;
-uint8_t pinCerrar = D2;
-uint8_t pinInterrupcion = D7;
-uint8_t boton = D5; 
-/*
-Para hacer pruebas podemos usar el codigo asi y conectar un boton al pin D5, para el proyecto terminado tendremos que cambiar esto por el boton del movil, controlado 
-desde arduino cloud
+/* 
+Estados de la puerta 
 */
-bool estado = false; //mi idea es usar un boolean para guardar si la puerta se estaba abriendo o cerrando. Por ejemplo podemos llamar false a cerrado y true a abierto
-int estados = 0; 
+enum EstadoPuerta {
+  PARADA,
+  ABRIENDO,
+  CERRANDO
+};
+
+volatile bool limite = false; //Esta variable se pone a true cuando la puerta llega a alguno de los extremos
+
+
+EstadoPuerta estadoPuerta = PARADA;
+bool puertaAbierta = false;   // Esta variable nos indica si la puerta esta abierta (true) o cerrada (false)
+
+/* Tiempos */
+const unsigned long debounceBoton = 300;   // ms
+unsigned long ultimoBoton = 0;
+
 /*
-nueva idea: dependiendo del numero de "estados" se hara una accion
-  estados = 0 -> la puerta no se mueve
-  estados = 1 -> la puerta se abre
-  estados = 2 -> la puerta se cierra
-el booleano "estado" nos sigue sirviendo pero para indicar el ultimo estado de la puera, asi en la interrupcion decidimos cual sera la proxima accion de la puerta
+Para parar la puerta cuando llegue a alguno de los limites usamos una interrupcion que se ejecuta cuando alguno de los interruptores limite es pulsado
 */
+void IRAM_ATTR ISR() {
+  limite = true;
+}
 
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(115200);
+
   pinMode(boton, INPUT_PULLUP);
-  pinMode(pinInterrupcion, INPUT_PULLUP); //usamos la resistencia pullup integrada en la placa
+  pinMode(pinInterrupcion, INPUT_PULLUP);
+
   pinMode(pinAbrir, OUTPUT);
   pinMode(pinCerrar, OUTPUT);
-  attachInterrupt(pinInterrupcion, isr, RISING); //Esto define una interrupcion, el primer valor es el pin que se observa, el segundo es la funcion a la que se llama en caso de la interrupcion, y el tercer valor es en que evento del pin llama a la funcion.
 
+  digitalWrite(pinAbrir, LOW);
+  digitalWrite(pinCerrar, LOW);
+  //Inicializamos los pines que activan los bjt a low para evitar cortos
+
+  attachInterrupt(pinInterrupcion, ISR, FALLING); //Esta es la interrupcion que se ejecuta cuando detecta un flanco de bajada en el pinInterrupcion, esto es asi porque lo tenemos en input pullup por lo que cuando es pulsado pasa de HIGH a LOW
 }
-
-
-/*
-La idea para el funcionamiento: cuando se este abriendo, el pinAbrir se pone a HIGH y el pinCerrar se pone a LOW. Se quedan asi hasta que se pulse uno de los 
-interruptores de limite, entonces se lleva a cabo la interrupccion que pondra ambos pines a low y se guarda un estado que nos indique que lo ultimo que ha hecho la 
-puerta es abrirse. De este modo sabremos que la siguiente accion sera cerrar, y para cerrar se hace justo lo opuesto a lo anterior.
-*/
 
 void loop() {
+
   
-  if (estados == 0 && digitalRead(boton)==LOW)
-  {
-    /* code */
-    if (estado)
-    {
-      /* code */
-      estados = 2;
+  if (digitalRead(boton) == LOW && estadoPuerta == PARADA) {
+    unsigned long ahora = millis(); //Esto de los millis me lo ha dicho chatgpt para evitar rebotes del boton
+    if (ahora - ultimoBoton > debounceBoton) {
+      ultimoBoton = ahora;
+
+      if (puertaAbierta) {
+        estadoPuerta = CERRANDO;
+        Serial.println("Cerrando puerta");
+      } else {
+        estadoPuerta = ABRIENDO;
+        Serial.println("Abriendo puerta");
+      }
     }
-    else {
-      estado = 1;
+  }
+
+  
+  if (limite) {
+    limite = false;
+
+    if (estadoPuerta == ABRIENDO) {
+      puertaAbierta = true;
+      Serial.println("Puerta totalmente abierta");
     }
-    
+    else if (estadoPuerta == CERRANDO) {
+      puertaAbierta = false;
+      Serial.println("Puerta totalmente cerrada");
+    }
+
+    estadoPuerta = PARADA;
   }
-  
 
-  if (estados == 1)
-  {
-    /*
-    aqui estamos en el caso en el que la ultima posicion extrema de la puerta era cerrada, entonces estado va a ser igual a false hasta que se habra del todo, pulse el 
-    interruptor de limite y ejecute la interrupcion, que debera cambiar estado a true
-    */
-    digitalWrite(pinCerrar, LOW);
-    // interesa poner algun delay para que de tiempo a que el mosfet se cierre
-    digitalWrite(pinAbrir, HIGH);
+  //Funcionamiento de la puerta segun el estado en el que se encuentre
+  switch (estadoPuerta) {
+
+    case ABRIENDO:
+      digitalWrite(pinCerrar, LOW);
+      digitalWrite(pinAbrir, LOW);
+      delay(10);                 // para que les de tiempo a los bjt a "asentarse" y evitar cortos
+      digitalWrite(pinAbrir, HIGH);
+      break;
+
+    case CERRANDO:
+      digitalWrite(pinAbrir, LOW);
+      digitalWrite(pinCerrar, LOW);
+      delay(10);
+      digitalWrite(pinCerrar, HIGH);
+      break;
+
+    case PARADA:
+    default:
+      digitalWrite(pinAbrir, LOW);
+      digitalWrite(pinCerrar, LOW);
+      break;
   }
-  else if (estados == 2)
-  {
-    digitalWrite(pinAbrir, LOW);
-    // aqui tambien ponemos delay
-    digitalWrite(pinCerrar, HIGH);
-
-    
-  }
-  else{
-    digitalWrite(pinCerrar, LOW);
-    digitalWrite(pinAbrir, LOW);
-  }
-  
-  /*
-  Ahora tenemos en teoria programado el comportamiento de la puerta cuando esta en movimiento, nos falta implementar como actuar la puerta cuando esta este parada, 
-  para eso tenemos que asociar una variable que nos indique cuando se ha pulsado el boton de abrir (desde la aplicacion de arduino cloud se pulsa este boton)
-  */
-  
-
-}
-
-void ICACHE_RAM_ATTR isr(){
-  //Esta sera la funcion llamada para la interrupcion cuando se pulse un interruptor limite
-
-  if (estado)
-  {
-    /*
-    En este caso el ultimo estado extremo de la puerta era abierto, lo que significa que ahora se ha pulsado el interruptor con la puerta cerrada, entonces debemos 
-    poner los pines del motor a LOW para que el motor se pare, y ademas actualizar "estado" a false para idicar que la puerta esta cerrada.
-    */
-
-    estados = 0;
-    estado = false;
-  }
-  else{
-    estados = 0;
-    estado = true;
-  }
-  
-
-}
-
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
 }
