@@ -54,11 +54,57 @@ void setup() {
 }
 
 void loop(){
-  //codigo de pruebas
-  if(!(digitalRead(boton))){
-    digitalWrite(pinAbrir, HIGH);
-  }else{
-    digitalWrite(pinAbrir, LOW);
+  
+  if(!(digitalRead(boton))/*esta expresion devuelve 'true' cuando se pulsa el boton*/ /*&& estadoPuerta == PARADA*/){ //Esto lo que intenta hacer es que si se pulsa el boton y la puerta esta parada (osea en uno de los extremos) entonces entrara en el bucle
+    unsigned long ahora = millis();
+    if(ahora - ultimoBoton > debounceBoton){
+      ultimoBoton = ahora;
+
+      if(puertaAbierta && estadoPuerta == PARADA){ //Si ha entrado en el bucle anterior y la puerta esta abierta pone la puerta en cerrando
+        estadoPuerta = CERRANDO;
+      }else if(!puertaAbierta && estadoPuerta == PARADA){
+        estadoPuerta = ABRIENDO;
+      }else{
+        limite = true;
+      }
+    }
+    //delay(2000);
+  }
+  if (limite) { //Esta es la accion activada por la interrupcion
+    limite = false;
+
+    if (estadoPuerta == ABRIENDO) {
+      puertaAbierta = true;
+    }
+    else if (estadoPuerta == CERRANDO) {
+      puertaAbierta = false;
+    }
+
+    estadoPuerta = PARADA;
+  }
+
+  //Funcionamiento de la puerta segun el estado en el que se encuentre
+  switch (estadoPuerta) {
+
+    case ABRIENDO:
+      digitalWrite(pinCerrar, LOW);
+      digitalWrite(pinAbrir, LOW);
+      delay(10);                 // para que les de tiempo a los bjt a "asentarse" y evitar cortos
+      digitalWrite(pinAbrir, HIGH);
+      break;
+
+    case CERRANDO:
+      digitalWrite(pinAbrir, LOW);
+      digitalWrite(pinCerrar, LOW);
+      delay(10);
+      digitalWrite(pinCerrar, HIGH);
+      break;
+
+    case PARADA:
+    default:
+      digitalWrite(pinAbrir, LOW);
+      digitalWrite(pinCerrar, LOW);
+      break;
   }
 }
 
@@ -66,20 +112,7 @@ void loop(){
 void loop() {
 
   
-  if (digitalRead(boton) == LOW && estadoPuerta == PARADA) { //Esto lo que intenta hacer es que si se pulsa el boton y la puerta esta parada (osea en uno de los extremos) entonces entrara en el bucle
-    unsigned long ahora = millis(); //Esto de los millis me lo ha dicho chatgpt para evitar rebotes del boton
-    if (ahora - ultimoBoton > debounceBoton) {
-      ultimoBoton = ahora;
-
-      if (puertaAbierta) { //Si ha entrado en el bucle anterior y la puerta esta abierta pone la puerta en cerrando
-        estadoPuerta = CERRANDO;
-        Serial.println("Cerrando puerta");
-      } else {
-        estadoPuerta = ABRIENDO;
-        Serial.println("Abriendo puerta");
-      }
-    }
-  }
+  
 
   
   if (limite) {
