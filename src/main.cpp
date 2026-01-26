@@ -30,9 +30,11 @@ unsigned long ultimoBoton = 0;
 /*
 Para parar la puerta cuando llegue a alguno de los limites usamos una interrupcion que se ejecuta cuando alguno de los interruptores limite es pulsado
 */
+/*
 void IRAM_ATTR ISR() {
   limite = true;
 }
+*/
 
 void setup() {
   Serial.begin(115200);
@@ -42,23 +44,34 @@ void setup() {
 
   pinMode(pinAbrir, OUTPUT);
   pinMode(pinCerrar, OUTPUT);
-
+/*
   digitalWrite(pinAbrir, LOW);
   digitalWrite(pinCerrar, LOW);
   //Inicializamos los pines que activan los bjt a low para evitar cortos
 
   attachInterrupt(pinInterrupcion, ISR, FALLING); //Esta es la interrupcion que se ejecuta cuando detecta un flanco de bajada en el pinInterrupcion, esto es asi porque lo tenemos en input pullup por lo que cuando es pulsado pasa de HIGH a LOW
+*/
 }
 
+void loop(){
+  //codigo de pruebas
+  if(!(digitalRead(boton))){
+    digitalWrite(pinAbrir, HIGH);
+  }else{
+    digitalWrite(pinAbrir, LOW);
+  }
+}
+
+/*
 void loop() {
 
   
-  if (digitalRead(boton) == LOW && estadoPuerta == PARADA) {
+  if (digitalRead(boton) == LOW && estadoPuerta == PARADA) { //Esto lo que intenta hacer es que si se pulsa el boton y la puerta esta parada (osea en uno de los extremos) entonces entrara en el bucle
     unsigned long ahora = millis(); //Esto de los millis me lo ha dicho chatgpt para evitar rebotes del boton
     if (ahora - ultimoBoton > debounceBoton) {
       ultimoBoton = ahora;
 
-      if (puertaAbierta) {
+      if (puertaAbierta) { //Si ha entrado en el bucle anterior y la puerta esta abierta pone la puerta en cerrando
         estadoPuerta = CERRANDO;
         Serial.println("Cerrando puerta");
       } else {
@@ -108,3 +121,4 @@ void loop() {
       break;
   }
 }
+*/
