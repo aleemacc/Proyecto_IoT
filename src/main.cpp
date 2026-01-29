@@ -23,18 +23,7 @@ volatile bool limite = false; //Esta variable se pone a true cuando la puerta ll
 EstadoPuerta estadoPuerta = PARADA;
 bool puertaAbierta = false;   // Esta variable nos indica si la puerta esta abierta (true) o cerrada (false)
 
-/* Tiempos */
-const unsigned long debounceBoton = 300;   // ms
-unsigned long ultimoBoton = 0;
 
-/*
-Para parar la puerta cuando llegue a alguno de los limites usamos una interrupcion que se ejecuta cuando alguno de los interruptores limite es pulsado
-*/
-/*
-void IRAM_ATTR ISR() {
-  limite = true;
-}
-*/
 
 void setup() {
   Serial.begin(115200);
@@ -44,114 +33,8 @@ void setup() {
 
   pinMode(pinAbrir, OUTPUT);
   pinMode(pinCerrar, OUTPUT);
-/*
-  digitalWrite(pinAbrir, LOW);
-  digitalWrite(pinCerrar, LOW);
-  //Inicializamos los pines que activan los bjt a low para evitar cortos
-
-  attachInterrupt(pinInterrupcion, ISR, FALLING); //Esta es la interrupcion que se ejecuta cuando detecta un flanco de bajada en el pinInterrupcion, esto es asi porque lo tenemos en input pullup por lo que cuando es pulsado pasa de HIGH a LOW
-*/
 }
 
 void loop(){
-  
-  if(!(digitalRead(boton))/*esta expresion devuelve 'true' cuando se pulsa el boton*/ /*&& estadoPuerta == PARADA*/){ //Esto lo que intenta hacer es que si se pulsa el boton y la puerta esta parada (osea en uno de los extremos) entonces entrara en el bucle
-    unsigned long ahora = millis();
-    if(ahora - ultimoBoton > debounceBoton){
-      ultimoBoton = ahora;
 
-      if(puertaAbierta && estadoPuerta == PARADA){ //Si ha entrado en el bucle anterior y la puerta esta abierta pone la puerta en cerrando
-        estadoPuerta = CERRANDO;
-      }else if(!puertaAbierta && estadoPuerta == PARADA){
-        estadoPuerta = ABRIENDO;
-      }else{
-        limite = true;
-      }
-    }
-    //delay(2000);
-  }
-  if (limite) { //Esta es la accion activada por la interrupcion
-    limite = false;
-
-    if (estadoPuerta == ABRIENDO) {
-      puertaAbierta = true;
-    }
-    else if (estadoPuerta == CERRANDO) {
-      puertaAbierta = false;
-    }
-
-    estadoPuerta = PARADA;
-  }
-
-  //Funcionamiento de la puerta segun el estado en el que se encuentre
-  switch (estadoPuerta) {
-
-    case ABRIENDO:
-      digitalWrite(pinCerrar, LOW);
-      digitalWrite(pinAbrir, LOW);
-      delay(10);                 // para que les de tiempo a los bjt a "asentarse" y evitar cortos
-      digitalWrite(pinAbrir, HIGH);
-      break;
-
-    case CERRANDO:
-      digitalWrite(pinAbrir, LOW);
-      digitalWrite(pinCerrar, LOW);
-      delay(10);
-      digitalWrite(pinCerrar, HIGH);
-      break;
-
-    case PARADA:
-    default:
-      digitalWrite(pinAbrir, LOW);
-      digitalWrite(pinCerrar, LOW);
-      break;
-  }
 }
-
-/*
-void loop() {
-
-  
-  
-
-  
-  if (limite) {
-    limite = false;
-
-    if (estadoPuerta == ABRIENDO) {
-      puertaAbierta = true;
-      Serial.println("Puerta totalmente abierta");
-    }
-    else if (estadoPuerta == CERRANDO) {
-      puertaAbierta = false;
-      Serial.println("Puerta totalmente cerrada");
-    }
-
-    estadoPuerta = PARADA;
-  }
-
-  //Funcionamiento de la puerta segun el estado en el que se encuentre
-  switch (estadoPuerta) {
-
-    case ABRIENDO:
-      digitalWrite(pinCerrar, LOW);
-      digitalWrite(pinAbrir, LOW);
-      delay(10);                 // para que les de tiempo a los bjt a "asentarse" y evitar cortos
-      digitalWrite(pinAbrir, HIGH);
-      break;
-
-    case CERRANDO:
-      digitalWrite(pinAbrir, LOW);
-      digitalWrite(pinCerrar, LOW);
-      delay(10);
-      digitalWrite(pinCerrar, HIGH);
-      break;
-
-    case PARADA:
-    default:
-      digitalWrite(pinAbrir, LOW);
-      digitalWrite(pinCerrar, LOW);
-      break;
-  }
-}
-*/
