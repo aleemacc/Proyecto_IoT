@@ -1,40 +1,59 @@
 #include <Arduino.h>
 
-/* 
-Para la placa podemos usar los pines D1, D2, D5, D6, D7, A0(solo para analogRead)
-*/
-const uint8_t pinAbrir = D1;
-const uint8_t pinCerrar = D2;
-const uint8_t pinInterrupcion = D7;
-const uint8_t boton = D5; //Este boton es temporal para hacer pruebas, el funcionamiento del boton lo tenemos que implementar con Arduino Cloud
+// Pines botones
+const uint8_t BTN_RESET = D5;
+const uint8_t BTN_TOGGLE = D6;
 
-/* 
-Estados de la puerta 
-*/
-enum EstadoPuerta {
-  PARADA,
-  ABRIENDO,
-  CERRANDO
-};
+// Pines salidas
+const uint8_t OUT1 = D1;
+const uint8_t OUT2 = D2;
 
-volatile bool limite = false; //Esta variable se pone a true cuando la puerta llega a alguno de los extremos
+// Variables de estado
+bool lastBtnResetState = HIGH;
+bool lastBtnToggleState = HIGH;
 
-
-EstadoPuerta estadoPuerta = PARADA;
-bool puertaAbierta = false;   // Esta variable nos indica si la puerta esta abierta (true) o cerrada (false)
-
-
+bool nextOutputIs1 = true;  // true -> D1, false -> D2
 
 void setup() {
-  Serial.begin(115200);
+    pinMode(BTN_RESET, INPUT_PULLUP);
+    pinMode(BTN_TOGGLE, INPUT_PULLUP);
 
-  pinMode(boton, INPUT_PULLUP);
-  pinMode(pinInterrupcion, INPUT_PULLUP);
+    pinMode(OUT1, OUTPUT);
+    pinMode(OUT2, OUTPUT);
 
-  pinMode(pinAbrir, OUTPUT);
-  pinMode(pinCerrar, OUTPUT);
+    digitalWrite(OUT1, LOW);
+    digitalWrite(OUT2, LOW);
 }
 
-void loop(){
+void loop() {
+    bool btnResetState  = digitalRead(BTN_RESET);
+    bool btnToggleState = digitalRead(BTN_TOGGLE);
 
+    // --- Botón D5: reset ---
+    if (lastBtnResetState == HIGH && btnResetState == LOW) {
+        digitalWrite(OUT1, LOW);
+        digitalWrite(OUT2, LOW);
+    }
+
+    // --- Botón D6: toggle ---
+    if (lastBtnToggleState == HIGH && btnToggleState == LOW) {
+
+        if (digitalRead(OUT1) == LOW && digitalRead(OUT2) == LOW) {
+            if (nextOutputIs1) {
+                digitalWrite(OUT1, HIGH);
+                digitalWrite(OUT2, LOW);
+            } else {
+                digitalWrite(OUT1, LOW);
+                digitalWrite(OUT2, HIGH);
+            }
+
+            // Alternar para la próxima vez
+            nextOutputIs1 = !nextOutputIs1;
+        }
+    }
+
+    lastBtnResetState  = btnResetState;
+    lastBtnToggleState = btnToggleState;
+
+    delay(20); // antirrebote simple
 }
