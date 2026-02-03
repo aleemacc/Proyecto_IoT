@@ -1,59 +1,59 @@
 #include <Arduino.h>
 
 // Pines botones
-const uint8_t BTN_RESET = D5;
-const uint8_t BTN_TOGGLE = D6;
+const uint8_t detener = D5;
+const uint8_t abrir_cerrar = D6;
 
 // Pines salidas
-const uint8_t OUT1 = D1;
-const uint8_t OUT2 = D2;
+const uint8_t motor1 = D1;
+const uint8_t motor2 = D2;
 
 // Variables de estado
-bool lastBtnResetState = HIGH;
-bool lastBtnToggleState = HIGH;
+bool lastEstadoLimite = HIGH;
+bool lastEstadoBoton = HIGH;
 
-bool nextOutputIs1 = true;  // true -> D1, false -> D2
+bool dirSiguiente = true;  // true -> D1, false -> D2
 
 void setup() {
-    pinMode(BTN_RESET, INPUT_PULLUP);
-    pinMode(BTN_TOGGLE, INPUT_PULLUP);
+    pinMode(detener, INPUT_PULLUP);
+    pinMode(abrir_cerrar, INPUT_PULLUP);
 
-    pinMode(OUT1, OUTPUT);
-    pinMode(OUT2, OUTPUT);
+    pinMode(motor1, OUTPUT);
+    pinMode(motor2, OUTPUT);
 
-    digitalWrite(OUT1, LOW);
-    digitalWrite(OUT2, LOW);
+    digitalWrite(motor1, LOW);
+    digitalWrite(motor2, LOW);
 }
 
 void loop() {
-    bool btnResetState  = digitalRead(BTN_RESET);
-    bool btnToggleState = digitalRead(BTN_TOGGLE);
+    bool estadoLimite  = digitalRead(detener);
+    bool estadoBoton = digitalRead(abrir_cerrar);
 
-    // --- Botón D5: reset ---
-    if (lastBtnResetState == HIGH && btnResetState == LOW) {
-        digitalWrite(OUT1, LOW);
-        digitalWrite(OUT2, LOW);
+    // Si se pulsa alguno de los interruptores de limite, el motor se para
+    if (lastEstadoLimite == HIGH && estadoLimite == LOW) {
+        digitalWrite(motor1, LOW);
+        digitalWrite(motor2, LOW);
     }
 
-    // --- Botón D6: toggle ---
-    if (lastBtnToggleState == HIGH && btnToggleState == LOW) {
+    // Si se pulsa el boton y el motor esta parado, se empieza a girar en la direccion contraria a la que estaba girando antes
+    if (lastEstadoBoton == HIGH && estadoBoton == LOW) {
 
-        if (digitalRead(OUT1) == LOW && digitalRead(OUT2) == LOW) {
-            if (nextOutputIs1) {
-                digitalWrite(OUT1, HIGH);
-                digitalWrite(OUT2, LOW);
+        if (digitalRead(motor1) == LOW && digitalRead(motor2) == LOW) {
+            if (dirSiguiente) {
+                digitalWrite(motor1, HIGH);
+                digitalWrite(motor2, LOW);
             } else {
-                digitalWrite(OUT1, LOW);
-                digitalWrite(OUT2, HIGH);
+                digitalWrite(motor1, LOW);
+                digitalWrite(motor2, HIGH);
             }
 
             // Alternar para la próxima vez
-            nextOutputIs1 = !nextOutputIs1;
+            dirSiguiente = !dirSiguiente;
         }
     }
 
-    lastBtnResetState  = btnResetState;
-    lastBtnToggleState = btnToggleState;
+    lastEstadoLimite  = estadoLimite;
+    lastEstadoBoton = estadoBoton;
 
     delay(20); // antirrebote simple
 }
