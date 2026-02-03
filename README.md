@@ -2,6 +2,10 @@ Este es el repositorio del proyecto IoT de Alejandro Macias, Rafael Garcia, Carl
 
 En este proyecto debemos crear una puerta de garaje que que cumpla los requisitos de la siguiente lista.
 
+**ideas para el codigo**
+en vez de usar dos pines distintos para los limites y abrir y cerrar la puerta, podriamos hacerlo todo con un mismo pin y un contador [0, 3], de modo que cuando el contador este a 0 la puerta esta parada, a 1 la puerta se abre, a 2 la puerta esta parada y a 3 la puerta se cierra.
+Si lo hacemos de este modo no podriamos parar la puerta con una interrupcion como tenia pensado pero puede que sea mas facil de implementar.
+
 **Lista de requisitos**
 - Debe poder abrirse con el movil
 - Debe usar un motor DC

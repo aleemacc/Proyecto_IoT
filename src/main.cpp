@@ -1,110 +1,59 @@
 #include <Arduino.h>
 
-/* 
-Para la placa podemos usar los pines D1, D2, D5, D6, D7, A0(solo para analogRead)
-*/
-const uint8_t pinAbrir = D1;
-const uint8_t pinCerrar = D2;
-const uint8_t pinInterrupcion = D7;
-const uint8_t boton = D5; //Este boton es temporal para hacer pruebas, el funcionamiento del boton lo tenemos que implementar con Arduino Cloud
+// Pines botones
+const uint8_t detener = D5;
+const uint8_t abrir_cerrar = D6;
 
-/* 
-Estados de la puerta 
-*/
-enum EstadoPuerta {
-  PARADA,
-  ABRIENDO,
-  CERRANDO
-};
+// Pines salidas
+const uint8_t motor1 = D1;
+const uint8_t motor2 = D2;
 
-volatile bool limite = false; //Esta variable se pone a true cuando la puerta llega a alguno de los extremos
+// Variables de estado
+bool lastEstadoLimite = HIGH;
+bool lastEstadoBoton = HIGH;
 
-
-EstadoPuerta estadoPuerta = PARADA;
-bool puertaAbierta = false;   // Esta variable nos indica si la puerta esta abierta (true) o cerrada (false)
-
-/* Tiempos */
-const unsigned long debounceBoton = 300;   // ms
-unsigned long ultimoBoton = 0;
-
-/*
-Para parar la puerta cuando llegue a alguno de los limites usamos una interrupcion que se ejecuta cuando alguno de los interruptores limite es pulsado
-*/
-void IRAM_ATTR ISR() {
-  limite = true;
-}
+bool dirSiguiente = true;  // true -> D1, false -> D2
 
 void setup() {
-  Serial.begin(115200);
+    pinMode(detener, INPUT_PULLUP);
+    pinMode(abrir_cerrar, INPUT_PULLUP);
 
-  pinMode(boton, INPUT_PULLUP);
-  pinMode(pinInterrupcion, INPUT_PULLUP);
+    pinMode(motor1, OUTPUT);
+    pinMode(motor2, OUTPUT);
 
-  pinMode(pinAbrir, OUTPUT);
-  pinMode(pinCerrar, OUTPUT);
-
-  digitalWrite(pinAbrir, LOW);
-  digitalWrite(pinCerrar, LOW);
-  //Inicializamos los pines que activan los bjt a low para evitar cortos
-
-  attachInterrupt(pinInterrupcion, ISR, FALLING); //Esta es la interrupcion que se ejecuta cuando detecta un flanco de bajada en el pinInterrupcion, esto es asi porque lo tenemos en input pullup por lo que cuando es pulsado pasa de HIGH a LOW
+    digitalWrite(motor1, LOW);
+    digitalWrite(motor2, LOW);
 }
 
 void loop() {
+    bool estadoLimite  = digitalRead(detener);
+    bool estadoBoton = digitalRead(abrir_cerrar);
 
-  
-  if (digitalRead(boton) == LOW && estadoPuerta == PARADA) {
-    unsigned long ahora = millis(); //Esto de los millis me lo ha dicho chatgpt para evitar rebotes del boton
-    if (ahora - ultimoBoton > debounceBoton) {
-      ultimoBoton = ahora;
-
-      if (puertaAbierta) {
-        estadoPuerta = CERRANDO;
-        Serial.println("Cerrando puerta");
-      } else {
-        estadoPuerta = ABRIENDO;
-        Serial.println("Abriendo puerta");
-      }
-    }
-  }
-
-  
-  if (limite) {
-    limite = false;
-
-    if (estadoPuerta == ABRIENDO) {
-      puertaAbierta = true;
-      Serial.println("Puerta totalmente abierta");
-    }
-    else if (estadoPuerta == CERRANDO) {
-      puertaAbierta = false;
-      Serial.println("Puerta totalmente cerrada");
+    // Si se pulsa alguno de los interruptores de limite, el motor se para
+    if (lastEstadoLimite == HIGH && estadoLimite == LOW) {
+        digitalWrite(motor1, LOW);
+        digitalWrite(motor2, LOW);
     }
 
-    estadoPuerta = PARADA;
-  }
+    // Si se pulsa el boton y el motor esta parado, se empieza a girar en la direccion contraria a la que estaba girando antes
+    if (lastEstadoBoton == HIGH && estadoBoton == LOW) {
 
-  //Funcionamiento de la puerta segun el estado en el que se encuentre
-  switch (estadoPuerta) {
+        if (digitalRead(motor1) == LOW && digitalRead(motor2) == LOW) {
+            if (dirSiguiente) {
+                digitalWrite(motor1, HIGH);
+                digitalWrite(motor2, LOW);
+            } else {
+                digitalWrite(motor1, LOW);
+                digitalWrite(motor2, HIGH);
+            }
 
-    case ABRIENDO:
-      digitalWrite(pinCerrar, LOW);
-      digitalWrite(pinAbrir, LOW);
-      delay(10);                 // para que les de tiempo a los bjt a "asentarse" y evitar cortos
-      digitalWrite(pinAbrir, HIGH);
-      break;
+            // Alternar para la próxima vez
+            dirSiguiente = !dirSiguiente;
+        }
+    }
 
-    case CERRANDO:
-      digitalWrite(pinAbrir, LOW);
-      digitalWrite(pinCerrar, LOW);
-      delay(10);
-      digitalWrite(pinCerrar, HIGH);
-      break;
+    lastEstadoLimite  = estadoLimite;
+    lastEstadoBoton = estadoBoton;
 
-    case PARADA:
-    default:
-      digitalWrite(pinAbrir, LOW);
-      digitalWrite(pinCerrar, LOW);
-      break;
-  }
+    delay(20); // antirrebote simple
 }
