@@ -1,5 +1,38 @@
 Este es el repositorio del proyecto IoT de Alejandro Macias, Rafael Garcia, Carlos Duran, Curro Blanco y Jorge Morales
 
+**Introducción y objetivos**
+
+El proyecto consiste en el diseño e implementacion de un sistema inteligente para accionar de manera remota una puerta de garaje. Para ello se nos han impuesto los siguientes requisitos:
+- Hacer uso de un microcontrolador ESP8266 para controlar un motor DC o un servomotor.
+- Usar un MOSFET o BJT para controlar el suministro de corriente al motor.
+- Implementar diodos para proteger contra corrientes inversas.
+
+El objetivo general es poder controlar la dirección de giro del motor, cambiando su polaridad, esto de manera remota.
+
+**Descripción del hardware**
+
+En el circuito, que se adjunta en la carpeta "files" de este repositorio, se utiliza una configuración de **Puente en H** para permitir la inversión de la polaridad en el motor, lo que se traduce en un cambio del sentido de giro.
+El este circuito se hace una separacion entre la alimentacion del motor y el control del mismo, debido a que el uC no es capaz de suministrar la suficienta corriente como para operar el motor.
+
+Para alternar la polaridad del motor se usa una combinación de BJT's NPN (BC337) y PNP (BC327), donde dos de los NPN se usan a modo de inversores, para poder activar los transistores PNP junto al correspondiente NPN dentro del puente en H.
+
+Se han incluido 4 diodos en paralelo con los transistores, para protegerlos de la corrientes que el motor pudiera inducir en el circuito.
+
+Tambien se han añadido resistencias en el circuito, que por un lado protengen al microcontrolador, y por otro se aseguran de que los transistores trabajen en zonda de saturación, actuando asi como interruptores.
+
+**Arquitectura de Control y Software**
+
+
+
+
+
+
+
+
+
+
+
+
 En este proyecto debemos crear una puerta de garaje que que cumpla los requisitos de la siguiente lista.
 
 **ideas para el codigo**
