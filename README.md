@@ -20,7 +20,7 @@ Se han incluido 4 diodos (1N4007) en paralelo con los transistores, para protege
 
 Tambien se han añadido resistencias en el circuito, que por un lado protengen al microcontrolador, y por otro se aseguran de que los transistores trabajen en zonda de saturación, actuando asi como interruptores.
 
-En la parte del circuito dedicada al control del funcionamiento de la puerta hemos añadido un boton que se encarga de abrir y cerrar la puerta, ademas de dos interruptores limite que nos indican cuando la puerta esta en alguno de sus extremos.
+En la parte del circuito dedicada al control del funcionamiento de la puerta hemos añadido un boton que se encarga de abrir y cerrar la puerta, ademas de dos interruptores limite que nos indican cuando la puerta esta en alguno de sus extremos, ambos haciendo uso de la resistencia de pull_up integrada en el ESP8266.
 
 **Arquitectura de Control y Software**
 
