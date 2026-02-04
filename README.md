@@ -28,5 +28,4 @@ En este repositorio se incluyen dos versiones del codigo fuente, la primera de e
     Primero se inicializa el servicio de la nube de Arduino, luego los pines encargados del manejo del motor se ponen a LOW, para que el estado inicial del motor sea parado.
     Luego, dentro del loop, definimos el resto del comportamiento, de manera que al pulsarse alguno de los botones limites el motor se para.
     Despues de esto, se comprueba si el boton de abrir y cerrar ha sido pulsado, si es el caso y el motor esta parado, este empezara a girar en sentido opuesto al que habia girado la ultima vez.
-
     Por ultimo se define el comportamiento cuando se actuan los botones en la aplicación, que es igual al comportamiento de los botones fisicos equivalentes.
