@@ -1,4 +1,4 @@
-Este es el repositorio del proyecto IoT de Alejandro Macias, Rafael Garcia, Carlos Duran, Curro Blanco y Jorge Morales
+Este es el repositorio del proyecto IoT de Alejandro Macias, Rafael Garcia, Carlos Duran, Curro Blanco y Jorge Morales.
 
 **Introducción y objetivos**
 
