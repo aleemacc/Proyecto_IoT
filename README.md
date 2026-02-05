@@ -12,7 +12,7 @@ El objetivo general es poder controlar la dirección de giro del motor, cambiand
 **Descripción del hardware**
 
 En el circuito, que se adjunta en la carpeta "files" de este repositorio, se utiliza una configuración de **Puente en H** para permitir la inversión de la polaridad en el motor, lo que se traduce en un cambio del sentido de giro.
-En este circuito se hace una separación entre la alimentacion del motor y el control del mismo, debido a que el uC no es capaz de suministrar la suficiente corriente como para operar el motor.
+En este circuito se hace una separación entre la alimentacion del motor y el control del mismo, debido a que el uC no es capaz de suministrar la suficiente corriente como para operar el motor. Sin embargo, hemos utilizado una pequeña placa que transforma los 9v de las pilas a 5v que usamos para alimentar el uC directamente de las baterias.
 
 Para alternar la polaridad del motor se usa una combinación de BJT's NPN (BC337) y PNP (BC327), donde dos de los NPN se usan a modo de inversores, para poder activar los transistores PNP junto al correspondiente NPN dentro del puente en H.
 
